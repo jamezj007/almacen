@@ -2,22 +2,24 @@ import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { DataService } from '../models/data-service';
 import { File } from '@ionic-native/file/ngx';
 import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { ImageResizer, ImageResizerOptions } from '@ionic-native/image-resizer/ngx';
-import { Producto } from '../models/data-models';
+import { DataService } from 'src/app/services/data-service';
+import { Bodega } from 'src/app/models/data-models';
 
 @Component({
-  selector: 'app-create-producto',
-  templateUrl: './create-producto.page.html',
-  styleUrls: ['./create-producto.page.scss'],
+  selector: 'app-create-bodega',
+  templateUrl: './create-bodega.page.html',
+  styleUrls: ['./create-bodega.page.scss'],
 })
-export class CreateProductoPage implements OnInit {
-  newProductoForm: FormGroup;
+export class CreateBodegaPage implements OnInit {
+  newBodegaForm: FormGroup;
   accion:string;
   Path: any = "/assets/shapes.svg";
   imagen: File | Blob | Uint8Array;
+  key: string;
+  Bodega: any;
   constructor(
     public navCtrl: NavController,
     public fb: FormBuilder,
@@ -30,11 +32,16 @@ export class CreateProductoPage implements OnInit {
     this.accion = this.route.snapshot.paramMap.get('accion');
     if(this.accion =='crear'){
       this.creaFormularioVacio()
+    }else{
+      this.key = this.route.snapshot.paramMap.get('key');
+      this.Bodega = this.ds.Database.Bodegas[this.key];
+      console.log(this.Bodega)
+      this.creaFormulario(this.Bodega)
     }
   }
   creaFormulario(data){
     //-------------------
-      this.newProductoForm = this.fb.group({
+      this.newBodegaForm = this.fb.group({
         imagen: new FormControl(data.imagen, Validators.compose([
           Validators.required,
           // Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')
@@ -43,41 +50,31 @@ export class CreateProductoPage implements OnInit {
           Validators.required,
           // Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')
         ])),
-        tipo: new FormControl(data.tipo, Validators.compose([
-          Validators.required,
-          // Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')
-        ])),
-        precio: new FormControl(data.precio, Validators.compose([
-          Validators.required,
-          Validators.maxLength(7),
-          Validators.minLength(1),
-          // Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')
-        ])),
         descripcion: new FormControl(data.descripcion, Validators.compose([Validators.required])),
-        disponibilidad: new FormControl(data.disponibilidad, Validators.compose([Validators.required])),
         largo: new FormControl(data.largo, Validators.compose([Validators.required])),
         ancho: new FormControl(data.ancho, Validators.compose([Validators.required])),
         alto: new FormControl(data.alto, Validators.compose([Validators.required])),
-        descuento: new FormControl(data.descuento, Validators.compose([Validators.required]))
+        cantidad: new FormControl(data.cantidad, Validators.compose([Validators.required]))
       });
     //-------------------
   }
   creaFormularioVacio(){
-    let data = new Producto
-    data['imagen'] = "/assets/shapes.svg";
-    data['nombre'] = '';
-    data['tipo'] = 'producto';
-    data['precio'] = 0;
+    let data = new Bodega
+    data.imagen = "/assets/shapes.svg";
+    data.nombre = '';
     data.descripcion = '';
-    data.disponibilidad = true;
     data.largo = 0;
     data.ancho = 0;
     data.alto = 0;
-    data.descuento = 0;
+    data.cantidad = 0;
     this.creaFormulario(data);
   }
-  creaProducto(){
-    console.log( this.newProductoForm.value)
+  creaBodega(){
+    let este = this;
+    // console.log('Se envia',this.newBodegaForm.value,this.imagen,this.accion,this.key)
+    this.ds.creaChild(this.newBodegaForm.value,this.imagen,this.accion,this.key,'bodegas').then(()=>{
+      este.navCtrl.pop()
+    })
   }
   camara(){
     const options: CameraOptions = {
@@ -107,7 +104,7 @@ export class CreateProductoPage implements OnInit {
               var reader = new FileReader();
               reader.onload =  (encodedFile: any)=>{
                 var src = encodedFile.target.result;
-                this.newProductoForm.value.imagen = src;
+                this.newBodegaForm.value.imagen = src;
                 this.imagen = this.convertDataUrlToBlob(src)
               }
               reader.readAsDataURL(file1);   
@@ -145,8 +142,8 @@ export class CreateProductoPage implements OnInit {
 
     reader.onload = function(e) {
       let src: any = e.target["result"];
-      este.newProductoForm.value.imagen = src;
-      let data = este.newProductoForm.value
+      este.newBodegaForm.value.imagen = src;
+      let data = este.newBodegaForm.value
       data['imagen'] =src;
       este.creaFormulario(data);
     };

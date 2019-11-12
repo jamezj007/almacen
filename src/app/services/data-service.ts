@@ -12,7 +12,7 @@ import { ReplaySubject } from 'rxjs';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { WebView } from '@ionic-native/ionic-webview/ngx';
-import { LocalDatabase, Producto, Bodega, Inventario } from './data-models'; // hola stanley - jaider
+import { LocalDatabase, Producto, Bodega, Inventario } from '../models/data-models';
 
 @Injectable()
 export class DataService {

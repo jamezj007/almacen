@@ -13,6 +13,7 @@
     }
     export class Bodega {
         public key: string // PushID de la bodega
+            public creacion: Date
             public nombre: string
             public codigo: string // ID unico para identificar la bodega
             public cantidad: number // numero total de productos, se calcula con base al inventario
@@ -22,6 +23,9 @@
             public ancho: number // ancho en metros[m] de la bodega
             public alto: number // alto en metros[m] de la bodega
         constructor() {
+            if(!this.creacion){
+                this.creacion = new Date()
+            }
             if (!this.imagen) {
                 this.imagen = "/assets/shapes.svg";
             }
@@ -34,27 +38,33 @@
             if (!this.cantidad) {
                 this.cantidad = 0;
             }
-            if (!this.modificacion) {
-                this.modificacion = "";
-            }
             if (!this.descripcion) {
                 this.descripcion = "";
             }
             if (!this.key) {
                 this.key = "";
             }
+            if(!this.largo){
+                this.largo = 0
+            }
+            if(!this.ancho){
+                this.ancho = 0
+            }
+            if(!this.alto){
+                this.alto = 0
+            }
         }
         get Capacidad(){
             return (this.alto * this.largo * this.ancho)
         }
     }
-    export class Documentos{
+    export class Documento{
         public key: string // PushID del documento
             public tipo: 'ingreso' | 'salida' | 'traslado' | 'notaDebito' | 'notaCredito'
             public creacion: Date
             public estado: 'pagado' | 'pendiente' | 'anulado'
             public numProductos: number // Numero total de productos relacionados en el documento
-            public vendedor: string // PushID del vendedor
+            public proveedor: string // PushID del proveedor
             public comprador: string // PushID del comprador al que va dirigida
             public usuario: string // PushID del empleado que realiza el documento
             public ListaDetallada: string // PushID de la lista detallada de productos relacionados en el documento
@@ -102,16 +112,47 @@
             public precio: number // precio de venta del producto [ solo el admin puede definirlo ]
             public descuento: number // porcentaje de descuento unitario [ solo el admin puede definirlo ]
         constructor() { 
+            if(!this.key){
+                this.key = ''
+            }
             if (!this.imagen) {
                 this.imagen = "/assets/shapes.svg";
             }
-            if (!this.nombre) {
-                this.nombre = "";
+            if(!this.creacion){
+                this.creacion = new Date()
             }
-            if (!this.cantidad && (this.tipo =='mueble')) {
-                this.cantidad = 1;
-                }else{
-                this.cantidad = 0;
+            if(!this.nombre){
+                this.nombre = ''
+            }
+            if(!this.tipo){
+                this.tipo = 'producto'
+            }
+            if(!this.imagen){
+                this.imagen = ''
+            }
+            if(!this.descripcion){
+                this.descripcion = ''
+            }
+            if(!this.disponibilidad){
+                this.disponibilidad = true
+            }
+            if(!this.largo){
+                this.largo = 0
+            }
+            if(!this.ancho){
+                this.ancho = 0
+            }
+            if(!this.alto){
+                this.alto = 0
+            }
+            if(!this.cantidad){
+                this.cantidad = 0
+            }
+            if(!this.precio){
+                this.precio = 0
+            }
+            if(!this.descuento){
+                this.descuento = 0
             }
         }
     }
@@ -133,14 +174,56 @@
             public usuario: string // PushID del empleado que realiza el documento // campo heredado del documento
             public documento: string // PushID del documento
         constructor() {
-            // condiciones iniciales
-            if (!this.vencimiento && (this.tipo =='consumible' || this.tipo == 'producto')) {
-                // this.vencimiento = 0;
+            if(!this.bodega){
+                this.bodega = ''
+            }
+            if(!this.ingreso){
+                this.ingreso = new Date();
+            }
+            if(!this.salida){
+                this.salida = null
+            }
+            if(!this.traslado){
+                this.traslado = null
+            }
+            if(!this.producto){
+                this.producto = ''
+            }
+            if(!this.vencimiento){
+                this.vencimiento = new Date();
+            }
+            if(!this.tipo){
+                this.tipo = 'producto'
+            }
+            if(!this.cantidad){
+                this.cantidad = 0
+            }
+            if(!this.precio){
+                this.precio = 0
+            }
+            if(!this.costo){
+                this.costo = 0
+            }
+            if(!this.serie){
+                this.serie = ''
+            }
+            if(!this.vendedor){
+                this.vendedor = ''
+            }
+            if(!this.usuario){
+                this.usuario = ''
+            }
+            if(!this.documento){
+                this.documento = ''
             }
         }
     }
 // ---- Data Base ---------------
     export class LocalDatabase {
-        
+        public Bodegas: { [key: string]: Bodega };
+        public Documentos: { [key: string]: Documento };
+        public ListaDetalladas: { [key: string]: ListaDetallada };
+        public Productos: { [key: string]: Producto };
+        public Inventario: { [key: string]: Inventario };
     }
 // ------------------------------
